@@ -85,13 +85,17 @@ class NsdDeviceDiscovery @Inject constructor(
     }
 
     private fun merge(incoming: TvDevice) {
-        val key = incoming.id
+        // Dedup by IP. SSDP M-SEARCH sends multiple targets and each one gets its
+        // own response from the same device, so the same TV appears N times under
+        // different USNs. Same IP = same device.
+        val key = incoming.ipAddress?.takeIf { it.isNotBlank() } ?: incoming.id
         val existing = discovered[key]
         if (existing == null ||
             (existing.brand == TvBrand.GENERIC && incoming.brand != TvBrand.GENERIC) ||
             (existing.ipAddress.isNullOrBlank() && !incoming.ipAddress.isNullOrBlank())
         ) {
-            discovered[key] = incoming
+            // Stable id keyed on IP so the recycler view doesn't churn the row.
+            discovered[key] = incoming.copy(id = key)
         }
     }
 

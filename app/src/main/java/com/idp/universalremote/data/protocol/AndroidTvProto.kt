@@ -112,23 +112,32 @@ internal object PairingFields {
  * RemoteMessage envelope used on port 6466 (after pairing).
  *
  * The protocol multiplexes many message kinds via a oneof; for sending key
- * events we only need [REMOTE_KEY_INJECT] (= field 16) with a nested
- * [RemoteKeyInject] carrying [direction] + [key_code].
+ * events we only need [REMOTE_KEY_INJECT] (= field 10) with a nested
+ * RemoteKeyInject carrying [KEY_CODE] (field 1) + [DIRECTION] (field 2).
  */
 internal object RemoteFields {
     /**
-     * RemoteMessage oneof tags. The messaging port (6466) silently drops every
-     * KeyInject we send until we've completed the init handshake:
-     *   1. RemoteConfigure  → TV replies with its own RemoteConfigure
-     *   2. RemoteSetActive  → TV starts accepting input
-     *   3. RemoteKeyInject  → button presses now reach the TV
+     * RemoteMessage oneof tags — taken from the canonical Android TV remote .proto
+     * (matches the protobuf-generated `Remotemessage.java` in the working sample).
+     *
+     * The handshake on the messaging port (6466) is:
+     *   1. TV → us:   RemoteConfigure
+     *   2. us → TV:   RemoteConfigure
+     *   3. TV → us:   another message (usually Configure/volume state)
+     *   4. us → TV:   RemoteSetActive(622)
+     *   5. TV → us:   RemoteStart  ← input service is now live
+     *   6. either way: RemoteKeyInject can be sent.
+     *
+     * Field numbers used to be guessed (3/12/13/16); they were wrong, which is why
+     * the TV silently dropped every KeyInject. The TV's protobuf parser sees a
+     * field it doesn't recognise as an unknown extension and just skips it.
      */
     const val REMOTE_CONFIGURE = 1
-    const val REMOTE_ACTIVE = 2
-    const val REMOTE_SET_ACTIVE = 3
-    const val REMOTE_PING_REQUEST = 12
-    const val REMOTE_PING_RESPONSE = 13
-    const val REMOTE_KEY_INJECT = 16
+    const val REMOTE_SET_ACTIVE = 2
+    const val REMOTE_PING_REQUEST = 8
+    const val REMOTE_PING_RESPONSE = 9
+    const val REMOTE_KEY_INJECT = 10
+    const val REMOTE_START = 40
 
     // RemoteConfigure fields
     const val CONF_CODE1 = 1
@@ -148,11 +157,15 @@ internal object RemoteFields {
     // RemotePingRequest / Response fields
     const val PING_VAL_1 = 1
 
-    // RemoteKeyInject fields
-    const val DIRECTION = 1
-    const val KEY_CODE = 2
+    // RemoteKeyInject fields — order matters: key_code=1, direction=2.
+    // (Previous code had them swapped, so we were telling the TV
+    //  "press SOFT_LEFT in direction 24" which is invalid → dropped.)
+    const val KEY_CODE = 1
+    const val DIRECTION = 2
 
     // RemoteDirection enum values
+    const val DIR_START_LONG = 1
+    const val DIR_END_LONG = 2
     const val DIR_SHORT = 3
 
     /** Magic activation code the TV expects in RemoteSetActive.active. */

@@ -41,7 +41,11 @@ class SearchDevicesFragment : Fragment(R.layout.fragment_search_devices) {
         binding.recycler.layoutManager = LinearLayoutManager(requireContext())
         binding.recycler.adapter = adapter
 
-        binding.btnRefresh.setOnClickListener { viewModel.refresh() }
+        binding.btnRefresh.setOnClickListener {
+            binding.progress.visibility = View.VISIBLE
+            viewModel.refresh()
+            scheduleProgressTimeout()
+        }
         binding.btnClose.setOnClickListener { findNavController().navigateUp() }
         binding.btnAddManually.setOnClickListener { showManualEntryDialog() }
 
@@ -54,7 +58,11 @@ class SearchDevicesFragment : Fragment(R.layout.fragment_search_devices) {
                 getString(R.string.found_devices_format, count)
             }
             binding.emptyHint.visibility = if (count == 0) View.VISIBLE else View.GONE
+            // Hide spinner as soon as we have any results.
+            if (count > 0) binding.progress.visibility = View.GONE
         }
+
+        scheduleProgressTimeout()
 
         collectFlow(viewModel.state) { state ->
             when (state) {
@@ -79,6 +87,7 @@ class SearchDevicesFragment : Fragment(R.layout.fragment_search_devices) {
     }
 
     override fun onDestroyView() {
+        binding.progress.removeCallbacks(progressTimeout)
         dismissDialog()
         super.onDestroyView()
     }
@@ -155,6 +164,16 @@ class SearchDevicesFragment : Fragment(R.layout.fragment_search_devices) {
         activeDeviceId = null
     }
 
+    private fun scheduleProgressTimeout() {
+        binding.progress.removeCallbacks(progressTimeout)
+        binding.progress.postDelayed(progressTimeout, PROGRESS_TIMEOUT_MS)
+    }
+
+    private val progressTimeout = Runnable {
+        // Even if nothing showed up, stop spinning after the search window.
+        if (view != null) binding.progress.visibility = View.GONE
+    }
+
     private fun hintFor(brand: TvBrand): Int = when (brand) {
         TvBrand.SONY -> R.string.pairing_hint_sony
         TvBrand.ANDROID_TV, TvBrand.GOOGLE_TV -> R.string.pairing_hint_pin
@@ -162,6 +181,7 @@ class SearchDevicesFragment : Fragment(R.layout.fragment_search_devices) {
     }
 
     companion object {
+        private const val PROGRESS_TIMEOUT_MS = 8_000L
         private val IP_PATTERN: Pattern =
             Pattern.compile("^(25[0-5]|2[0-4]\\d|[01]?\\d?\\d)(\\.(25[0-5]|2[0-4]\\d|[01]?\\d?\\d)){3}$")
 

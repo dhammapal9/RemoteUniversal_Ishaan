@@ -48,11 +48,18 @@ class AndroidTvCertStore @Inject constructor(
     fun loadOrCreate(): KeyStore {
         val ks = KeyStore.getInstance("PKCS12")
         if (storeFile.exists()) {
-            val loaded = runCatching {
+            val cert = runCatching {
                 storeFile.inputStream().use { ks.load(it, PASSPHRASE) }
-                ks.containsAlias(ALIAS)
-            }.getOrDefault(false)
-            if (loaded) return ks
+                if (!ks.containsAlias(ALIAS)) null
+                else ks.getCertificate(ALIAS) as? X509Certificate
+            }.getOrNull()
+            // Only re-use the store if it carries a cert with the *current* CN.
+            // When we change EXPECTED_CN (e.g. to satisfy a stricter TV firmware)
+            // every old install must regenerate, or the TV will keep rejecting
+            // a cert with a stale name.
+            if (cert != null && cert.subjectX500Principal.name.contains("CN=$EXPECTED_CN")) {
+                return ks
+            }
             runCatching { storeFile.delete() }
         }
         return createNew(KeyStore.getInstance("PKCS12"))
@@ -70,7 +77,10 @@ class AndroidTvCertStore @Inject constructor(
     }
 
     private fun selfSign(keyPair: KeyPair): X509Certificate {
-        val subject = X500Name("CN=UniversalRemote, OU=Phone, O=UR, C=US")
+        // CN must be a name the TV's polo verifier accepts. Empirically Thomson,
+        // TCL and Mi Box all accept "AndroidRemote"; some stricter firmwares
+        // even use the CN as a routing hint for the input service.
+        val subject = X500Name("CN=AndroidRemote, OU=Phone, O=Universal Remote, C=US")
         val now = System.currentTimeMillis()
         val notBefore = Date(now - 24L * 60 * 60 * 1000)
         val notAfter = Date(now + 10L * 365 * 24 * 60 * 60 * 1000)
@@ -131,6 +141,8 @@ class AndroidTvCertStore @Inject constructor(
 
     companion object {
         const val ALIAS = "atv-remote"
+        /** Must match the CN baked into [selfSign]'s X500Name. */
+        const val EXPECTED_CN = "AndroidRemote"
         val PASSPHRASE = "universal-remote".toCharArray()
     }
 }

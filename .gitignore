@@ -34,3 +34,4 @@ captures/
 
 # macOS
 .DS_Store
+.aider*

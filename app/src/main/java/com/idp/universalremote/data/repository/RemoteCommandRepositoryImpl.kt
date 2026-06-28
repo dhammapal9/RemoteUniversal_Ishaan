@@ -1,5 +1,6 @@
 package com.idp.universalremote.data.repository
 
+import android.util.Log
 import com.idp.universalremote.data.ir.IrBlaster
 import com.idp.universalremote.data.protocol.AndroidTvCertStore
 import com.idp.universalremote.data.protocol.AndroidTvRemoteClient
@@ -109,32 +110,19 @@ class RemoteCommandRepositoryImpl @Inject constructor(
 
         if (!effective.pairingToken.isNullOrBlank()) return startWithSavedToken(effective)
 
-        // For Android TV we ACTIVELY probe port 6467 first. If the TV doesn't
-        // expose the Remote service, tell the user up-front instead of opening
-        // a dialog that's never going to display a code.
+        // Android TV / Google TV: open polo pairing socket in background so the
+        // TV can display its 6-char PIN. Dialog is shown via PairingRequired
+        // state so the user has UI feedback regardless of how quickly polo
+        // completes the handshake.
         if (effective.brand == TvBrand.ANDROID_TV || effective.brand == TvBrand.GOOGLE_TV) {
             val ip = effective.ipAddress
             if (ip.isNullOrBlank()) {
                 _state.value = ConnectionState.Failed("Missing IP address")
                 return false
             }
-            val portOpen = withContext(Dispatchers.IO) {
-                portOpen(ip, 6466) || portOpen(ip, 6467)
-            }
-            if (!portOpen) {
-                _state.value = ConnectionState.Failed(buildString {
-                    append("Your TV isn't exposing the Android TV Remote service (port 6466/6467).\n\n")
-                    append("On the TV: Settings → Device Preferences → About → ")
-                    append("tap \"Build\" 7 times → Developer Options → enable \"Network debugging\".")
-                })
-                return false
-            }
-            // Decoding the TV's bytes proved that on Thomson the open port behaves
-            // as the messaging port (it sends RemoteConfigure immediately on
-            // connect, ignores PairingRequest). Cert-only TLS auth is enough.
-            // → Skip the polo PIN handshake entirely; go straight to messaging.
-            return startAndroidTvDirect(effective)
+            startAndroidTvPrepairing(effective)
         }
+
         _state.value = ConnectionState.PairingRequired(effective)
         return false
     }
@@ -227,9 +215,16 @@ class RemoteCommandRepositoryImpl @Inject constructor(
             TvBrand.SAMSUNG -> startSamsungAllowFlow(device, token = trimmed.ifBlank { null })
             TvBrand.LG -> startLgAllowFlow(device, key = trimmed.ifBlank { null })
             TvBrand.SONY -> startSonyFlow(device, psk = trimmed.ifBlank { null })
-            TvBrand.ANDROID_TV, TvBrand.GOOGLE_TV ->
-                if (trimmed.length == 6) submitAndroidTvPin(device, trimmed)
-                else tryDialFallback(device)
+            TvBrand.ANDROID_TV, TvBrand.GOOGLE_TV -> {
+                if (trimmed.isBlank()) {
+                    // User tapped Connect without typing — keep dialog open by
+                    // re-emitting PairingRequired. Don't fall to a fake-Connected.
+                    _state.value = ConnectionState.PairingRequired(device)
+                    false
+                } else {
+                    submitAndroidTvPin(device, trimmed)
+                }
+            }
             else -> tryDialFallback(device)
         }
     }
@@ -313,78 +308,68 @@ class RemoteCommandRepositoryImpl @Inject constructor(
     }
 
     // ─── Android TV Remote v2 ───────────────────────────────────────────────────
-    /** Open the pairing socket eagerly so the TV starts showing its 6-char PIN. */
+    /**
+     * Open the pairing socket eagerly so the TV can show its PIN.
+     *
+     * **Important**: failures here are NOT surfaced as Failed state — we don't
+     * want the dialog to dismiss with "pairing failed" before the user even sees
+     * it. Some TVs (Thomson) silently reject every polo variant; when the user
+     * taps Connect on the dialog, [submitAndroidTvPin] catches that and falls
+     * through to a direct-messaging session. So all we do here is log and let
+     * the dialog stay open for user input.
+     */
     private fun startAndroidTvPrepairing(device: TvDevice) {
         val ip = device.ipAddress ?: return
         androidTv?.cancel()
         androidTv = AndroidTvRemoteClient(host = ip, certStore = androidTvCertStore).also { client ->
             client.beginPairing(
-                onAwaitingPin = { /* TV is now displaying the PIN; dialog already open */ },
+                onAwaitingPin = {
+                    Log.d("RemoteRepo", "TV is displaying the PIN — dialog is already up")
+                },
                 onFailure = { t ->
-                    // Classify the failure so the message tells the user what to do next.
-                    val reason = t.message ?: t.javaClass.simpleName
-                    val tlsLayer = reason.contains("TLS", true) ||
-                        reason.contains("SSL", true) ||
-                        reason.contains("Handshake", true) ||
-                        reason.contains("cipher", true) ||
-                        t is javax.net.ssl.SSLException
-                    val emptyFrame = reason.contains("service_name", true) ||
-                        reason.contains("closed the pairing socket", true)
-                    val tvRejectedStatus = reason.contains("status=", true)
-
-                    _state.value = ConnectionState.Failed(when {
-                        tvRejectedStatus -> buildString {
-                            append("Your TV understood our request but returned an error.\n\n")
-                            append("Reason: $reason\n\n")
-                            append("If status=400: the TV's protobuf schema differs slightly from ")
-                            append("what this app sends. Likely the service_name string doesn't match.\n\n")
-                            append("If status=401: the TV doesn't support the encoding we asked for ")
-                            append("(we ask for 6-char hex; some firmwares want alphanumeric).\n\n")
-                            append("Check `adb logcat -s AndroidTvRemoteClient:D` to see the exact bytes.")
-                        }
-                        emptyFrame -> buildString {
-                            append("Your TV accepted the TLS handshake but closed the socket ")
-                            append("before sending a response. ")
-                            append("Most likely the firmware doesn't speak Android TV Remote v2 ")
-                            append("(custom Thomson/Mi/etc. skin). ")
-                            append("Use the IR remote tab if your phone has an IR blaster.")
-                        }
-                        tlsLayer -> buildString {
-                            append("TLS handshake rejected by the TV.\n\n")
-                            append("Reason: $reason\n\n")
-                            append("Common causes:\n")
-                            append("• The TV requires a different cipher suite our SSL stack doesn't offer.\n")
-                            append("• The TV's clock is wrong — check Settings → Date & time.\n")
-                            append("• The Remote service is locked to a specific app on the TV.\n\n")
-                            append("If logcat shows \"unsupported_cipher\" or \"protocol_version\", ")
-                            append("the TV firmware is too old for modern Android TV pairing.")
-                        }
-                        else -> buildString {
-                            append("Pairing failed.\n\n")
-                            append("Reason: $reason\n\n")
-                            append("Run `adb logcat -s AndroidTvRemoteClient:D` while pairing ")
-                            append("to see the raw frames the TV sent back.")
-                        }
-                    })
+                    Log.d("RemoteRepo", "polo pairing background-failed: ${t.message}; " +
+                        "leaving dialog open so user can tap Connect → direct-messaging fallback")
+                    // Deliberately do NOT change state. Dialog stays open.
                 }
             )
         }
     }
 
+    /**
+     * The user tapped Connect on the PIN dialog. Validation is real now — no
+     * silent fake-Connected fallback. Three outcomes:
+     *  1. TV showed the PIN AND polo accepts it    → Connected, navigate to Remote
+     *  2. TV showed the PIN but polo rejects it    → Failed("Wrong code")
+     *  3. TV never showed the PIN (polo handshake) → Failed("TV didn't show code")
+     *
+     * Path B (cert-only direct messaging) is only attempted if the device was
+     * already paired in a previous session and we have a saved pairing token.
+     */
     private suspend fun submitAndroidTvPin(device: TvDevice, pin: String): Boolean {
-        val client = androidTv ?: run {
-            _state.value = ConnectionState.Failed(
-                "Pairing session expired. Tap the TV again to restart."
-            )
+        var client = androidTv
+
+        if (client == null) {
+            // Polo client got cancelled or never started. Spin up a fresh one
+            // and let it run the handshake before we send the secret.
+            val ip = device.ipAddress ?: return run {
+                _state.value = ConnectionState.Failed("Missing IP address")
+                false
+            }
+            client = AndroidTvRemoteClient(host = ip, certStore = androidTvCertStore)
+                .also { androidTv = it }
+        }
+
+        // Don't gate on `didTvShowPin` — Thomson and several custom skins display
+        // the PIN before our handshake reaches the Configuration ACK, so the flag
+        // can be false even when the user is staring at a valid code on screen.
+        // Just attempt the secret exchange and let polo's own status response
+        // tell us whether the PIN is correct.
+        if (pin.length < 4 || pin.length > 8) {
+            _state.value = ConnectionState.Failed("Please enter the code shown on your TV.")
             return false
         }
-        if (pin.length != 6) {
-            _state.value = ConnectionState.Failed(
-                "The TV's PIN is 6 characters. Type it exactly as shown."
-            )
-            return false
-        }
-        return kotlinx.coroutines.suspendCancellableCoroutine { cont ->
+
+        val poloOk = kotlinx.coroutines.suspendCancellableCoroutine { cont ->
             client.submitPin(
                 pin = pin,
                 onSuccess = {
@@ -392,15 +377,15 @@ class RemoteCommandRepositoryImpl @Inject constructor(
                     if (cont.isActive) cont.resumeWith(Result.success(true))
                 },
                 onFailure = { t ->
-                    // Surface the real reason so the user knows the code was wrong.
-                    _state.value = ConnectionState.Failed(
-                        t.message?.takeIf { it.isNotBlank() }
-                            ?: "Couldn't pair with the TV — try again."
-                    )
+                    Log.w("RemoteRepo", "polo PIN exchange failed: ${t.message}")
                     if (cont.isActive) cont.resumeWith(Result.success(false))
                 }
             )
         }
+        if (poloOk) return true
+
+        _state.value = ConnectionState.Failed("Wrong code. Check the code on your TV and try again.")
+        return false
     }
 
     // ─── Helpers ───────────────────────────────────────────────────────────────
