@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">यूनिवर्सल रिमोट</string>
+    <string name="app_tagline">यूनिवर्सल टीवी रिमोट कंट्रोल</string>
+    <string name="loading">लोड हो रहा है…</string>
+    <string name="searching_devices">डिवाइस खोजे जा रहे हैं…</string>
+    <string name="connect_tv">टीवी से कनेक्ट करें</string>
+    <string name="hero_title">यूनिवर्सल\nटीवी रिमोट</string>
+    <string name="nav_remote">रिमोट</string>
+    <string name="nav_settings">सेटिंग्स</string>
+    <string name="nav_mirroring">मिररिंग</string>
+    <string name="nav_cast">कास्ट</string>
+    <string name="settings_title">सेटिंग्स</string>
+    <string name="continue_text">जारी रखें</string>
+    <string name="get_started">शुरू करें</string>
+    <string name="skip">छोड़ें</string>
+    <string name="next">अगला</string>
+</resources>

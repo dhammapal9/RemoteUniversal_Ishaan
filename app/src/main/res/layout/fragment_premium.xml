@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_gradient_amoled">
+
+    <ImageButton
+        android:id="@+id/close"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="@dimen/spacing_lg"
+        android:layout_marginTop="@dimen/spacing_lg"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/close"
+        android:src="@drawable/ic_close"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/hero"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:layout_marginTop="@dimen/spacing_xl"
+        android:contentDescription="@null"
+        android:src="@drawable/ic_check_circle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/close" />
+
+    <TextView
+        android:id="@+id/heroTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_md"
+        android:text="@string/device_detected"
+        android:textColor="@color/white"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/hero" />
+
+    <TextView
+        android:id="@+id/heroSub"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/ready_for_setup"
+        android:textColor="@color/text_secondary_dark"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/heroTitle" />
+
+    <LinearLayout
+        android:id="@+id/features"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/spacing_3xl"
+        android:layout_marginTop="@dimen/spacing_2xl"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/heroSub">
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginVertical="@dimen/spacing_sm" android:gravity="center_vertical" android:orientation="horizontal">
+            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_tv" app:tint="@color/accent_cyan" android:contentDescription="@null" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginStart="@dimen/spacing_md" android:text="@string/premium_feature_1" android:textColor="@color/white" />
+        </LinearLayout>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginVertical="@dimen/spacing_sm" android:gravity="center_vertical" android:orientation="horizontal">
+            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_play" app:tint="@color/accent_cyan" android:contentDescription="@null" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginStart="@dimen/spacing_md" android:text="@string/premium_feature_2" android:textColor="@color/white" />
+        </LinearLayout>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginVertical="@dimen/spacing_sm" android:gravity="center_vertical" android:orientation="horizontal">
+            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_finger" app:tint="@color/accent_cyan" android:contentDescription="@null" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginStart="@dimen/spacing_md" android:text="@string/premium_feature_3" android:textColor="@color/white" />
+        </LinearLayout>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginVertical="@dimen/spacing_sm" android:gravity="center_vertical" android:orientation="horizontal">
+            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_remote" app:tint="@color/accent_cyan" android:contentDescription="@null" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginStart="@dimen/spacing_md" android:text="@string/premium_feature_4" android:textColor="@color/white" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/lifetimeCard"
+        style="@style/Widget.UniversalRemote.Card"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/spacing_xl"
+        android:layout_marginTop="@dimen/spacing_xl"
+        app:cardBackgroundColor="@color/surface_dark_elevated"
+        app:cardCornerRadius="@dimen/radius_lg"
+        app:cardElevation="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/features"
+        app:strokeColor="@color/accent_blue"
+        app:strokeWidth="1.5dp">
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal" android:padding="@dimen/spacing_lg">
+            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_check_circle" android:contentDescription="@null" />
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="@dimen/spacing_md" android:layout_weight="1" android:orientation="vertical">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/lifetime_label" android:textColor="@color/white" android:textStyle="bold" android:textSize="16sp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/lifetime_subtitle" android:textColor="@color/text_secondary_dark" />
+            </LinearLayout>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/lifetime_price_default" android:textColor="@color/white" android:textStyle="bold" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <Button
+        android:id="@+id/continueBtn"
+        style="@style/Widget.UniversalRemote.Button.Gradient"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/button_height_lg"
+        android:layout_marginHorizontal="@dimen/spacing_xl"
+        android:layout_marginTop="@dimen/spacing_xl"
+        android:text="@string/continue_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/lifetimeCard" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/spacing_xl"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:padding="@dimen/spacing_md" android:text="@string/terms" android:textColor="@color/text_secondary_dark" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:padding="@dimen/spacing_md" android:text="@string/privacy" android:textColor="@color/text_secondary_dark" />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

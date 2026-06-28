@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Mando Universal</string>
+    <string name="app_tagline">Mando Universal para TV</string>
+    <string name="loading">Cargando…</string>
+    <string name="searching_devices">Buscando dispositivos…</string>
+    <string name="connect_tv">Conectar TV</string>
+    <string name="hero_title">Mando\nUniversal TV</string>
+    <string name="nav_remote">Mando</string>
+    <string name="nav_settings">Ajustes</string>
+    <string name="nav_mirroring">Espejo</string>
+    <string name="nav_cast">Enviar</string>
+    <string name="settings_title">Ajustes</string>
+    <string name="continue_text">Continuar</string>
+    <string name="get_started">Empezar</string>
+    <string name="skip">Saltar</string>
+    <string name="next">Siguiente</string>
+</resources>

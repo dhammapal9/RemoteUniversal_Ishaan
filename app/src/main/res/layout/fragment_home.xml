@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:attr/colorBackground"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="100dp">
+
+        <!-- Top bar -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="@dimen/spacing_lg">
+
+            <ImageButton
+                android:id="@+id/btnMenu"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/nav_settings"
+                android:src="@drawable/ic_menu" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/spacing_lg"
+                android:layout_weight="1"
+                android:text="@string/app_tagline"
+                android:textAppearance="@style/TextAppearance.UniversalRemote.Title" />
+
+            <ImageButton
+                android:id="@+id/btnPremium"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/go_premium"
+                android:src="@drawable/ic_crown" />
+        </LinearLayout>
+
+        <!-- Hero card -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/heroCard"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/hero_height"
+            android:layout_marginHorizontal="@dimen/spacing_lg"
+            android:layout_marginTop="@dimen/spacing_md"
+            android:background="@drawable/bg_hero_card"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:id="@+id/heroIcon"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:layout_marginStart="@dimen/spacing_2xl"
+                android:contentDescription="@string/app_tagline"
+                android:src="@drawable/ic_wifi"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/white" />
+
+            <TextView
+                android:id="@+id/heroTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/spacing_lg"
+                android:text="@string/hero_title"
+                android:textColor="@color/white"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/heroArrow"
+                app:layout_constraintStart_toEndOf="@id/heroIcon"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageButton
+                android:id="@+id/heroArrow"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginEnd="@dimen/spacing_2xl"
+                android:background="@drawable/bg_remote_button_circle"
+                android:contentDescription="@string/connect_tv"
+                android:src="@drawable/ic_arrow_right"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/spacing_xl"
+            android:layout_marginTop="@dimen/spacing_2xl"
+            android:text="@string/tv_remotes"
+            android:textAppearance="@style/TextAppearance.UniversalRemote.Title" />
+
+        <com.google.android.material.card.MaterialCardView
+            style="@style/Widget.UniversalRemote.Card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/spacing_lg"
+            android:layout_marginTop="@dimen/spacing_md"
+            app:cardCornerRadius="@dimen/radius_xl"
+            app:cardElevation="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="@dimen/spacing_lg">
+
+                <LinearLayout
+                    android:id="@+id/btnSamsung"
+                    style="@style/Widget.UniversalRemote.RemoteButton"
+                    android:layout_width="0dp"
+                    android:layout_height="120dp"
+                    android:layout_weight="1"
+                    android:background="?attr/selectableItemBackground"
+                    android:gravity="center"
+                    android:orientation="vertical">
+                    <ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_remote" app:tint="@color/accent_blue" android:contentDescription="@string/cat_samsung" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="@dimen/spacing_sm" android:gravity="center" android:text="@string/cat_samsung" android:textAppearance="@style/TextAppearance.UniversalRemote.Body" android:textStyle="bold" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/btnRoku"
+                    android:layout_width="0dp"
+                    android:layout_height="120dp"
+                    android:layout_weight="1"
+                    android:background="?attr/selectableItemBackground"
+                    android:gravity="center"
+                    android:orientation="vertical">
+                    <ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_dpad" android:contentDescription="@string/cat_roku" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="@dimen/spacing_sm" android:gravity="center" android:text="@string/cat_roku" android:textAppearance="@style/TextAppearance.UniversalRemote.Body" android:textStyle="bold" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/btnIr"
+                    android:layout_width="0dp"
+                    android:layout_height="120dp"
+                    android:layout_weight="1"
+                    android:background="?attr/selectableItemBackground"
+                    android:gravity="center"
+                    android:orientation="vertical">
+                    <ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_tv" app:tint="@color/accent_blue" android:contentDescription="@string/cat_ir" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="@dimen/spacing_sm" android:gravity="center" android:text="@string/cat_ir" android:textAppearance="@style/TextAppearance.UniversalRemote.Body" android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/spacing_xl"
+            android:layout_marginTop="@dimen/spacing_2xl"
+            android:text="@string/mirroring"
+            android:textAppearance="@style/TextAppearance.UniversalRemote.Title" />
+
+        <com.google.android.material.card.MaterialCardView
+            style="@style/Widget.UniversalRemote.Card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/spacing_lg"
+            android:layout_marginTop="@dimen/spacing_md"
+            app:cardCornerRadius="@dimen/radius_xl"
+            app:cardElevation="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="@dimen/spacing_lg">
+
+                <LinearLayout android:id="@+id/btnIptv" android:layout_width="0dp" android:layout_height="120dp" android:layout_weight="1" android:background="?attr/selectableItemBackground" android:gravity="center" android:orientation="vertical">
+                    <ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_iptv" android:contentDescription="@string/iptv" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="@dimen/spacing_sm" android:text="@string/iptv" android:textAppearance="@style/TextAppearance.UniversalRemote.Body" android:textStyle="bold" />
+                </LinearLayout>
+
+                <LinearLayout android:id="@+id/btnScreenMirror" android:layout_width="0dp" android:layout_height="120dp" android:layout_weight="1" android:background="?attr/selectableItemBackground" android:gravity="center" android:orientation="vertical">
+                    <ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_mirror" app:tint="@color/accent_blue" android:contentDescription="@string/screen_mirroring" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="@dimen/spacing_sm" android:gravity="center" android:text="@string/screen_mirroring" android:textAppearance="@style/TextAppearance.UniversalRemote.Body" android:textStyle="bold" />
+                </LinearLayout>
+
+                <LinearLayout android:id="@+id/btnScreenCast" android:layout_width="0dp" android:layout_height="120dp" android:layout_weight="1" android:background="?attr/selectableItemBackground" android:gravity="center" android:orientation="vertical">
+                    <ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_cast" app:tint="@color/accent_blue" android:contentDescription="@string/screen_cast" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="@dimen/spacing_sm" android:text="@string/screen_cast" android:textAppearance="@style/TextAppearance.UniversalRemote.Body" android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/spacing_xl"
+            android:layout_marginTop="@dimen/spacing_2xl"
+            android:text="@string/more"
+            android:textAppearance="@style/TextAppearance.UniversalRemote.Title" />
+
+        <com.google.android.material.card.MaterialCardView
+            style="@style/Widget.UniversalRemote.Card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/spacing_lg"
+            android:layout_marginTop="@dimen/spacing_md"
+            app:cardCornerRadius="@dimen/radius_xl"
+            app:cardElevation="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="@dimen/spacing_lg">
+
+                <LinearLayout android:id="@+id/btnThemes" android:layout_width="0dp" android:layout_height="120dp" android:layout_weight="1" android:background="?attr/selectableItemBackground" android:gravity="center" android:orientation="vertical">
+                    <ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_palette" app:tint="@color/accent_blue" android:contentDescription="@string/nav_themes" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="@dimen/spacing_sm" android:text="@string/nav_themes" android:textAppearance="@style/TextAppearance.UniversalRemote.Body" android:textStyle="bold" />
+                </LinearLayout>
+
+                <LinearLayout android:id="@+id/btnMyRemotes" android:layout_width="0dp" android:layout_height="120dp" android:layout_weight="1" android:background="?attr/selectableItemBackground" android:gravity="center" android:orientation="vertical">
+                    <ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_remote" android:contentDescription="@string/nav_remote" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="@dimen/spacing_sm" android:text="My Remotes" android:textAppearance="@style/TextAppearance.UniversalRemote.Body" android:textStyle="bold" />
+                </LinearLayout>
+
+                <LinearLayout android:id="@+id/btnSettings" android:layout_width="0dp" android:layout_height="120dp" android:layout_weight="1" android:background="?attr/selectableItemBackground" android:gravity="center" android:orientation="vertical">
+                    <ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_settings" app:tint="@color/accent_blue" android:contentDescription="@string/nav_settings" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="@dimen/spacing_sm" android:text="@string/nav_settings" android:textAppearance="@style/TextAppearance.UniversalRemote.Body" android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

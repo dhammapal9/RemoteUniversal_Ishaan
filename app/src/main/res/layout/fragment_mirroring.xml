@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:attr/colorBackground"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/spacing_lg">
+
+        <Button
+            android:id="@+id/startMirroring"
+            style="@style/Widget.UniversalRemote.Button.Gradient"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_marginTop="@dimen/spacing_md"
+            android:drawableStart="@drawable/ic_mirror"
+            android:drawablePadding="@dimen/spacing_sm"
+            android:text="@string/start_mirroring" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_2xl"
+            android:text="@string/screen_mirror"
+            android:textAppearance="@style/TextAppearance.UniversalRemote.Title" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_md"
+            android:text="@string/mirror_step_1"
+            android:textAppearance="@style/TextAppearance.UniversalRemote.Body" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_sm"
+            android:text="@string/mirror_step_2"
+            android:textAppearance="@style/TextAppearance.UniversalRemote.Body" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_sm"
+            android:text="@string/mirror_step_3"
+            android:textAppearance="@style/TextAppearance.UniversalRemote.Body" />
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

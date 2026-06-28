@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- AMOLED / Carbon Black palette -->
+    <color name="amoled_black">#FF000000</color>
+    <color name="carbon_black">#FF0A0A0F</color>
+    <color name="surface_dark">#FF14141B</color>
+    <color name="surface_dark_elevated">#FF1C1C26</color>
+    <color name="surface_card">#FF181820</color>
+    <color name="graphite">#FF22222C</color>
+    <color name="graphite_light">#FF2C2C38</color>
+    <color name="divider_dark">#22FFFFFF</color>
+
+    <!-- Light surfaces -->
+    <color name="surface_light">#FFF6F8FB</color>
+    <color name="surface_light_card">#FFFFFFFF</color>
+    <color name="surface_light_elevated">#FFEDEFF4</color>
+
+    <!-- Accent: Neon blue / electric cyan -->
+    <color name="accent_blue">#FF2A7CFF</color>
+    <color name="accent_blue_light">#FF4F94FF</color>
+    <color name="accent_blue_translucent">#332A7CFF</color>
+    <color name="accent_blue_soft">#1A2A7CFF</color>
+    <color name="accent_cyan">#FF00E5FF</color>
+    <color name="accent_neon">#FF3DFDFF</color>
+    <color name="accent_violet">#FF8A5CFF</color>
+    <color name="accent_pink">#FFE63F8C</color>
+    <color name="accent_orange">#FFFF7849</color>
+    <color name="accent_red">#FFEF4444</color>
+    <color name="accent_green">#FF22C55E</color>
+    <color name="accent_amber">#FFF59E0B</color>
+
+    <!-- Text -->
+    <color name="text_primary_dark">#FFFFFFFF</color>
+    <color name="text_secondary_dark">#B8FFFFFF</color>
+    <color name="text_tertiary_dark">#80FFFFFF</color>
+    <color name="text_disabled_dark">#52FFFFFF</color>
+
+    <color name="text_primary_light">#FF0F1419</color>
+    <color name="text_secondary_light">#FF49545F</color>
+    <color name="text_tertiary_light">#FF6C7782</color>
+    <color name="text_disabled_light">#FFB1B7BE</color>
+
+    <!-- Gradient endpoints -->
+    <color name="gradient_pink_start">#FFE63F8C</color>
+    <color name="gradient_pink_end">#FF8A5CFF</color>
+    <color name="gradient_blue_start">#FF2A7CFF</color>
+    <color name="gradient_blue_end">#FF00E5FF</color>
+    <color name="gradient_orange_start">#FFFF7849</color>
+    <color name="gradient_orange_end">#FFE63F8C</color>
+    <color name="gradient_violet_start">#FF6A4DFF</color>
+    <color name="gradient_violet_end">#FF1A95FF</color>
+
+    <!-- Premium / paywall -->
+    <color name="premium_gold">#FFFFC73A</color>
+    <color name="premium_dark">#FF0B1622</color>
+    <color name="premium_overlay">#CC000000</color>
+
+    <!-- Status -->
+    <color name="status_connected">#FF22C55E</color>
+    <color name="status_searching">#FFF59E0B</color>
+    <color name="status_disconnected">#FFEF4444</color>
+
+    <color name="ripple_white">#33FFFFFF</color>
+    <color name="ripple_black">#1A000000</color>
+    <color name="overlay_scrim">#80000000</color>
+
+    <color name="transparent">#00000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="black">#FF000000</color>
+</resources>

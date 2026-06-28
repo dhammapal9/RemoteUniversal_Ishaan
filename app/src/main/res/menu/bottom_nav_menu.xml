@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/remoteFragment"
+        android:icon="@drawable/ic_remote"
+        android:title="@string/nav_remote" />
+    <item
+        android:id="@+id/appsFragment"
+        android:icon="@drawable/ic_apps"
+        android:title="@string/nav_apps" />
+    <item
+        android:id="@+id/mirroringFragment"
+        android:icon="@drawable/ic_mirror"
+        android:title="@string/nav_mirroring" />
+    <item
+        android:id="@+id/castFragment"
+        android:icon="@drawable/ic_cast"
+        android:title="@string/nav_cast" />
+    <item
+        android:id="@+id/settingsFragment"
+        android:icon="@drawable/ic_settings"
+        android:title="@string/nav_settings" />
+</menu>

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:attr/colorBackground"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/spacing_lg">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/connect_to_device"
+            android:textAppearance="@style/TextAppearance.UniversalRemote.Title"
+            android:layout_marginBottom="@dimen/spacing_lg" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/tapToMirror"
+            style="@style/Widget.UniversalRemote.Card"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:clickable="true"
+            android:focusable="true"
+            app:cardCornerRadius="@dimen/radius_xl"
+            app:cardElevation="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="@dimen/spacing_lg">
+                <ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_mirror" app:tint="@color/text_primary_dark" android:contentDescription="@null" />
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="@dimen/spacing_md" android:text="@string/tap_to_screen_mirror" android:textAppearance="@style/TextAppearance.UniversalRemote.Body" android:textSize="17sp" android:textStyle="bold" />
+                <ImageView android:layout_width="32dp" android:layout_height="32dp" android:contentDescription="@null" android:src="@drawable/ic_arrow_right" app:tint="@color/accent_blue" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_2xl"
+            android:text="@string/cast_media"
+            android:textAppearance="@style/TextAppearance.UniversalRemote.Title" />
+
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:columnCount="3"
+            android:layout_marginTop="@dimen/spacing_md"
+            android:useDefaultMargins="true">
+
+            <com.google.android.material.card.MaterialCardView android:id="@+id/photoCard" style="@style/Widget.UniversalRemote.Card" android:layout_width="0dp" android:layout_height="120dp" android:layout_columnWeight="1" android:layout_margin="@dimen/spacing_sm" app:cardCornerRadius="@dimen/radius_lg" app:cardElevation="0dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical">
+                    <ImageView android:layout_width="36dp" android:layout_height="36dp" android:src="@drawable/ic_image" android:contentDescription="@string/cast_photo" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="@dimen/spacing_sm" android:text="@string/cast_photo" android:textColor="?attr/colorOnSurface" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView android:id="@+id/videoCard" style="@style/Widget.UniversalRemote.Card" android:layout_width="0dp" android:layout_height="120dp" android:layout_columnWeight="1" android:layout_margin="@dimen/spacing_sm" app:cardCornerRadius="@dimen/radius_lg" app:cardElevation="0dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical">
+                    <ImageView android:layout_width="36dp" android:layout_height="36dp" android:src="@drawable/ic_video" android:contentDescription="@string/cast_video" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="@dimen/spacing_sm" android:text="@string/cast_video" android:textColor="?attr/colorOnSurface" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView android:id="@+id/audioCard" style="@style/Widget.UniversalRemote.Card" android:layout_width="0dp" android:layout_height="120dp" android:layout_columnWeight="1" android:layout_margin="@dimen/spacing_sm" app:cardCornerRadius="@dimen/radius_lg" app:cardElevation="0dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical">
+                    <ImageView android:layout_width="36dp" android:layout_height="36dp" android:src="@drawable/ic_audio" android:contentDescription="@string/cast_audio" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="@dimen/spacing_sm" android:text="@string/cast_audio" android:textColor="?attr/colorOnSurface" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView android:id="@+id/iptvCard" style="@style/Widget.UniversalRemote.Card" android:layout_width="0dp" android:layout_height="120dp" android:layout_columnWeight="1" android:layout_margin="@dimen/spacing_sm" app:cardCornerRadius="@dimen/radius_lg" app:cardElevation="0dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical">
+                    <ImageView android:layout_width="36dp" android:layout_height="36dp" android:src="@drawable/ic_iptv" android:contentDescription="@string/iptv" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="@dimen/spacing_sm" android:text="@string/iptv" android:textColor="?attr/colorOnSurface" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView android:id="@+id/imageOnlineCard" style="@style/Widget.UniversalRemote.Card" android:layout_width="0dp" android:layout_height="120dp" android:layout_columnWeight="1" android:layout_margin="@dimen/spacing_sm" app:cardCornerRadius="@dimen/radius_lg" app:cardElevation="0dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical">
+                    <ImageView android:layout_width="36dp" android:layout_height="36dp" android:src="@drawable/ic_image" android:contentDescription="@string/image_online" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="@dimen/spacing_sm" android:text="@string/image_online" android:textColor="?attr/colorOnSurface" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView android:id="@+id/cameraCard" style="@style/Widget.UniversalRemote.Card" android:layout_width="0dp" android:layout_height="120dp" android:layout_columnWeight="1" android:layout_margin="@dimen/spacing_sm" app:cardCornerRadius="@dimen/radius_lg" app:cardElevation="0dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical">
+                    <ImageView android:layout_width="36dp" android:layout_height="36dp" android:src="@drawable/ic_camera" android:contentDescription="@string/camera" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="@dimen/spacing_sm" android:text="@string/camera" android:textColor="?attr/colorOnSurface" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </GridLayout>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

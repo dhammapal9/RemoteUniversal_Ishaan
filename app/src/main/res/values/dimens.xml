@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="spacing_xxs">2dp</dimen>
+    <dimen name="spacing_xs">4dp</dimen>
+    <dimen name="spacing_sm">8dp</dimen>
+    <dimen name="spacing_md">12dp</dimen>
+    <dimen name="spacing_lg">16dp</dimen>
+    <dimen name="spacing_xl">20dp</dimen>
+    <dimen name="spacing_2xl">24dp</dimen>
+    <dimen name="spacing_3xl">32dp</dimen>
+    <dimen name="spacing_4xl">48dp</dimen>
+
+    <dimen name="radius_xs">8dp</dimen>
+    <dimen name="radius_sm">12dp</dimen>
+    <dimen name="radius_md">16dp</dimen>
+    <dimen name="radius_lg">20dp</dimen>
+    <dimen name="radius_xl">24dp</dimen>
+    <dimen name="radius_2xl">28dp</dimen>
+    <dimen name="radius_3xl">36dp</dimen>
+
+    <dimen name="elevation_xs">2dp</dimen>
+    <dimen name="elevation_sm">4dp</dimen>
+    <dimen name="elevation_md">6dp</dimen>
+    <dimen name="elevation_lg">12dp</dimen>
+
+    <dimen name="icon_sm">18dp</dimen>
+    <dimen name="icon_md">24dp</dimen>
+    <dimen name="icon_lg">36dp</dimen>
+    <dimen name="icon_xl">56dp</dimen>
+
+    <dimen name="button_height">52dp</dimen>
+    <dimen name="button_height_sm">40dp</dimen>
+    <dimen name="button_height_lg">60dp</dimen>
+
+    <dimen name="remote_button_size">72dp</dimen>
+    <dimen name="remote_button_size_lg">96dp</dimen>
+    <dimen name="remote_ok_size">120dp</dimen>
+    <dimen name="dpad_outer">280dp</dimen>
+
+    <dimen name="bottom_nav_height">68dp</dimen>
+    <dimen name="toolbar_height">56dp</dimen>
+    <dimen name="hero_height">160dp</dimen>
+</resources>

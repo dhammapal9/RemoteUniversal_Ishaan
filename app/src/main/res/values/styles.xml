@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Widget.UniversalRemote.Button" parent="Widget.Material3.Button">
+        <item name="cornerRadius">28dp</item>
+        <item name="android:paddingTop">14dp</item>
+        <item name="android:paddingBottom">14dp</item>
+        <item name="android:paddingStart">24dp</item>
+        <item name="android:paddingEnd">24dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.02</item>
+    </style>
+
+    <style name="Widget.UniversalRemote.Button.Gradient" parent="Widget.AppCompat.Button">
+        <item name="android:background">@drawable/bg_button_gradient_blue</item>
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:paddingBottom">16dp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:stateListAnimator">@null</item>
+    </style>
+
+    <style name="Widget.UniversalRemote.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="cornerRadius">28dp</item>
+        <item name="strokeColor">?attr/colorPrimary</item>
+        <item name="strokeWidth">1.5dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Widget.UniversalRemote.Button.Text" parent="Widget.Material3.Button.TextButton">
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="Widget.UniversalRemote.BottomNav" parent="Widget.Material3.BottomNavigationView">
+        <item name="itemIconTint">@color/selector_bottom_nav</item>
+        <item name="itemTextColor">@color/selector_bottom_nav</item>
+        <item name="itemTextAppearanceActive">@style/TextAppearance.UniversalRemote.NavLabel.Active</item>
+        <item name="itemTextAppearanceInactive">@style/TextAppearance.UniversalRemote.NavLabel</item>
+        <item name="labelVisibilityMode">labeled</item>
+        <item name="backgroundTint">@color/surface_card</item>
+        <item name="itemActiveIndicatorStyle">@style/BottomNav.ActiveIndicator</item>
+        <item name="itemPaddingTop">6dp</item>
+        <item name="itemPaddingBottom">6dp</item>
+        <item name="itemIconSize">22dp</item>
+        <item name="elevation">8dp</item>
+    </style>
+
+    <style name="BottomNav.ActiveIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:width">56dp</item>
+        <item name="android:height">26dp</item>
+        <item name="android:color">@color/accent_blue_translucent</item>
+        <item name="marginHorizontal">0dp</item>
+    </style>
+
+    <style name="TextAppearance.UniversalRemote.NavLabel" parent="TextAppearance.Material3.LabelMedium">
+        <item name="android:textSize">11sp</item>
+        <item name="android:letterSpacing">0.01</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
+    <style name="TextAppearance.UniversalRemote.NavLabel.Active">
+        <item name="android:textSize">11sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.01</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
+    <style name="Widget.UniversalRemote.Card" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardCornerRadius">28dp</item>
+        <item name="cardElevation">0dp</item>
+        <item name="rippleColor">@color/ripple_white</item>
+        <item name="cardBackgroundColor">?attr/colorSurface</item>
+    </style>
+
+    <style name="Widget.UniversalRemote.Card.Glass">
+        <item name="cardBackgroundColor">@color/surface_dark_elevated</item>
+        <item name="strokeColor">@color/divider_dark</item>
+        <item name="strokeWidth">1dp</item>
+    </style>
+
+    <style name="TextAppearance.UniversalRemote.Display" parent="TextAppearance.Material3.DisplaySmall">
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">-0.02</item>
+    </style>
+
+    <style name="TextAppearance.UniversalRemote.Title" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.UniversalRemote.HeroTitle" parent="TextAppearance.Material3.HeadlineMedium">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+
+    <style name="TextAppearance.UniversalRemote.Body" parent="TextAppearance.Material3.BodyMedium" />
+
+    <style name="TextAppearance.UniversalRemote.Caption" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    </style>
+
+    <!-- ─── Settings screen ─── -->
+    <style name="Widget.UniversalRemote.SettingsCard" parent="Widget.Material3.CardView.Elevated">
+        <item name="android:layout_marginTop">@dimen/spacing_sm</item>
+        <item name="cardCornerRadius">@dimen/radius_xl</item>
+        <item name="cardElevation">0dp</item>
+        <item name="cardBackgroundColor">?attr/colorSurface</item>
+        <item name="strokeColor">@color/divider_dark</item>
+        <item name="strokeWidth">0dp</item>
+    </style>
+
+    <style name="Widget.UniversalRemote.SettingsRow" parent="">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">68dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:paddingHorizontal">@dimen/spacing_lg</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+
+    <style name="Widget.UniversalRemote.RowDivider" parent="">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:layout_marginStart">72dp</item>
+        <item name="android:background">?attr/colorOutlineVariant</item>
+    </style>
+
+    <style name="TextAppearance.UniversalRemote.SectionHeader" parent="TextAppearance.Material3.LabelMedium">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/spacing_xl</item>
+        <item name="android:layout_marginStart">@dimen/spacing_md</item>
+        <item name="android:layout_marginBottom">@dimen/spacing_xs</item>
+        <item name="android:textColor">@color/accent_blue_light</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.08</item>
+    </style>
+
+    <style name="TextAppearance.UniversalRemote.SettingsTitle" parent="">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.UniversalRemote.SettingsValue" parent="">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">2dp</item>
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="Widget.UniversalRemote.RemoteButton" parent="">
+        <item name="android:background">@drawable/bg_remote_button</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:tint">@color/text_primary_dark</item>
+        <item name="android:padding">14dp</item>
+    </style>
+
+    <!-- 3x3 utility button cell used in the bottom controls grid -->
+    <style name="Widget.UniversalRemote.UtilButton" parent="">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">64dp</item>
+        <item name="android:layout_margin">4dp</item>
+        <item name="android:layout_columnWeight">1</item>
+        <item name="android:background">@drawable/bg_remote_button</item>
+        <item name="android:scaleType">centerInside</item>
+        <item name="android:tint">@color/text_primary_dark</item>
+    </style>
+
+    <!-- Numeric keypad button -->
+    <style name="Widget.UniversalRemote.NumButton" parent="">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">68dp</item>
+        <item name="android:layout_margin">4dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:background">@drawable/bg_remote_button</item>
+        <item name="android:textColor">@color/text_primary_dark</item>
+        <item name="android:textSize">26sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Widget.UniversalRemote.NumIconButton" parent="">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">68dp</item>
+        <item name="android:layout_margin">4dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:background">@drawable/bg_remote_button</item>
+        <item name="android:scaleType">centerInside</item>
+        <item name="android:tint">@color/text_primary_dark</item>
+    </style>
+
+    <!-- App shortcut card -->
+    <style name="Widget.UniversalRemote.AppShortcut" parent="Widget.AppCompat.Button">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_marginHorizontal">4dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:stateListAnimator">@null</item>
+    </style>
+
+    <style name="Widget.UniversalRemote.RemoteButton.Circular">
+        <item name="android:background">@drawable/bg_remote_button_circle</item>
+    </style>
+
+    <style name="Widget.UniversalRemote.RemoteButton.Power">
+        <item name="android:background">@drawable/bg_remote_button_power</item>
+    </style>
+
+    <style name="Widget.UniversalRemote.RemoteButton.OK">
+        <item name="android:background">@drawable/bg_remote_button_ok</item>
+    </style>
+
+    <style name="Widget.UniversalRemote.Toolbar" parent="Widget.Material3.Toolbar">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="titleTextAppearance">@style/TextAppearance.UniversalRemote.Title</item>
+        <item name="titleCentered">true</item>
+    </style>
+
+    <style name="Widget.UniversalRemote.Switch" parent="Widget.Material3.CompoundButton.MaterialSwitch">
+        <item name="thumbTint">@color/selector_switch_thumb</item>
+        <item name="trackTint">@color/selector_switch_track</item>
+    </style>
+
+    <style name="Widget.UniversalRemote.TabLayout" parent="Widget.Material3.TabLayout">
+        <item name="tabIndicatorColor">@color/accent_blue</item>
+        <item name="tabSelectedTextColor">@color/accent_blue</item>
+        <item name="tabTextColor">?attr/colorOnSurfaceVariant</item>
+        <item name="tabRippleColor">@color/ripple_white</item>
+    </style>
+
+    <style name="Widget.UniversalRemote.ProgressBar.Linear" parent="Widget.Material3.LinearProgressIndicator">
+        <item name="indicatorColor">@color/accent_blue</item>
+        <item name="trackColor">@color/divider_dark</item>
+        <item name="trackThickness">3dp</item>
+        <item name="trackCornerRadius">2dp</item>
+    </style>
+
+    <style name="Widget.UniversalRemote.ProgressBar.Circular" parent="Widget.Material3.CircularProgressIndicator">
+        <item name="indicatorColor">@color/accent_blue</item>
+        <item name="trackThickness">3dp</item>
+    </style>
+
+    <style name="Animation.UniversalRemote.BottomSheet" parent="Animation.Material3.BottomSheetDialog">
+    </style>
+
+    <style name="ThemeOverlay.UniversalRemote.BottomSheet" parent="ThemeOverlay.Material3.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/Widget.UniversalRemote.BottomSheet</item>
+    </style>
+
+    <style name="Widget.UniversalRemote.BottomSheet" parent="Widget.Material3.BottomSheet">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.UniversalRemote.BottomSheet</item>
+        <item name="backgroundTint">?attr/colorSurface</item>
+    </style>
+
+    <style name="ShapeAppearance.UniversalRemote.BottomSheet" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">28dp</item>
+        <item name="cornerSizeTopRight">28dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+    </style>
+</resources>

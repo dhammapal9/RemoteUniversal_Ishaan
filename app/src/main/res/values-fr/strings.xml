@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Télécommande Universelle</string>
+    <string name="app_tagline">Télécommande Universelle TV</string>
+    <string name="loading">Chargement…</string>
+    <string name="searching_devices">Recherche d\'appareils…</string>
+    <string name="connect_tv">Connecter TV</string>
+    <string name="hero_title">Télécommande\nUniverselle TV</string>
+    <string name="nav_remote">Télécommande</string>
+    <string name="nav_settings">Paramètres</string>
+    <string name="nav_mirroring">Miroir</string>
+    <string name="nav_cast">Diffuser</string>
+    <string name="settings_title">Paramètres</string>
+    <string name="continue_text">Continuer</string>
+    <string name="get_started">Commencer</string>
+    <string name="skip">Passer</string>
+    <string name="next">Suivant</string>
+</resources>

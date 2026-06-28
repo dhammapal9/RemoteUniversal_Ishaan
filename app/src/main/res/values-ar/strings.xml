@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">جهاز التحكم العالمي</string>
+    <string name="app_tagline">جهاز التحكم العالمي للتلفزيون</string>
+    <string name="loading">جارٍ التحميل…</string>
+    <string name="searching_devices">جارٍ البحث عن الأجهزة…</string>
+    <string name="connect_tv">الاتصال بالتلفزيون</string>
+    <string name="hero_title">جهاز التحكم\nالعالمي للتلفزيون</string>
+    <string name="nav_remote">التحكم</string>
+    <string name="nav_settings">الإعدادات</string>
+    <string name="nav_mirroring">عرض الشاشة</string>
+    <string name="nav_cast">إرسال</string>
+    <string name="settings_title">الإعدادات</string>
+    <string name="continue_text">متابعة</string>
+    <string name="get_started">ابدأ</string>
+    <string name="skip">تخطي</string>
+    <string name="next">التالي</string>
+</resources>
