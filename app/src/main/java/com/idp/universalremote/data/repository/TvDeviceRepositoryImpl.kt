@@ -28,6 +28,9 @@ class TvDeviceRepositoryImpl @Inject constructor(
     override suspend fun get(id: String): TvDevice? =
         dao.findById(id)?.toDomain()
 
+    override suspend fun findByIp(ip: String): TvDevice? =
+        dao.findByIp(ip)?.toDomain()
+
     override suspend fun save(device: TvDevice) {
         dao.upsert(device.toEntity())
     }

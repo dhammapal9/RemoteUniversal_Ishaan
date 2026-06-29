@@ -266,6 +266,12 @@
     <string name="connection_failed">Connection failed</string>
     <string name="ir_not_supported">This device does not have an IR blaster</string>
     <string name="please_connect_tv">Please connect a TV first</string>
+    <string name="media_permission_required">Allow media access to pick photos, videos or audio to cast.</string>
+    <string name="notification_permission_required">Allow notifications so the mirroring session stays visible while running.</string>
+    <string name="cast_app_launched">Opening %1$s on your TV…</string>
+    <string name="cast_app_failed">Could not launch %1$s on this TV.</string>
+    <string name="cast_media_failed">Your TV doesn\'t accept direct media casts. Use the Mirroring tab to share your screen instead.</string>
+    <string name="feature_coming_soon">This feature is coming soon.</string>
 
     <!-- Languages list -->
     <string name="lang_english">English</string>

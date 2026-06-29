@@ -1,7 +1,11 @@
 package com.idp.universalremote.data.repository
 
+import android.content.Context
 import android.util.Log
+import com.idp.universalremote.data.cast.HttpFileServer
+import com.idp.universalremote.data.cast.UpnpCastClient
 import com.idp.universalremote.data.ir.IrBlaster
+import com.idp.universalremote.data.protocol.AndroidTvAppLinkMap
 import com.idp.universalremote.data.protocol.AndroidTvCertStore
 import com.idp.universalremote.data.protocol.AndroidTvRemoteClient
 import com.idp.universalremote.data.protocol.DialClient
@@ -15,11 +19,14 @@ import com.idp.universalremote.data.protocol.SamsungTizenClient
 import com.idp.universalremote.data.protocol.SonyBraviaClient
 import com.idp.universalremote.domain.model.ConnectionState
 import com.idp.universalremote.domain.model.ConnectionType
+import com.idp.universalremote.domain.model.MediaItem
+import com.idp.universalremote.domain.model.MediaType
 import com.idp.universalremote.domain.model.RemoteKey
 import com.idp.universalremote.domain.model.TvBrand
 import com.idp.universalremote.domain.model.TvDevice
 import com.idp.universalremote.domain.repository.RemoteCommandRepository
 import com.idp.universalremote.domain.repository.TvDeviceRepository
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -32,6 +39,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import java.net.NetworkInterface
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -54,6 +62,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class RemoteCommandRepositoryImpl @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val deviceRepository: TvDeviceRepository,
     private val irBlaster: IrBlaster,
     private val androidTvCertStore: AndroidTvCertStore
@@ -79,6 +88,14 @@ class RemoteCommandRepositoryImpl @Inject constructor(
     private var dial: DialClient? = null
     private var pairingTimeoutJob: Job? = null
 
+    // Lazily-started UPnP cast plumbing. Both pieces stay null until the user
+    // actually tries to cast something — there's no point hoarding a TCP listener
+    // or doing UPnP discovery for a session that's only using the remote pad.
+    private val httpFileServer = HttpFileServer(context.contentResolver)
+    private val upnpClient = UpnpCastClient(context)
+    private var cachedAvTransportUrl: String? = null
+    private var cachedAvTransportHost: String? = null
+
     /**
      * Step 1: stage the connection. We always end up in [ConnectionState.PairingRequired]
      * for Wi-Fi devices so the SensusTech-style "Enter Pairing Code" dialog always
@@ -86,22 +103,36 @@ class RemoteCommandRepositoryImpl @Inject constructor(
      * brand handshake by [pair].
      */
     override suspend fun connect(device: TvDevice): Boolean {
-        currentDevice = device
+        // Merge any persisted pairing token / saved brand from a prior session.
+        // Without this, a freshly-discovered TvDevice from SSDP has no token, so
+        // we'd re-run the polo PIN handshake — but the TV won't show a PIN the
+        // second time around because our cert is already authorized, leaving the
+        // user staring at an empty pairing dialog.
+        val withSaved = restoreSavedPairing(device)
+        currentDevice = withSaved
         cancelPairingTimeout()
-        _state.value = ConnectionState.Connecting(device)
+        _state.value = ConnectionState.Connecting(withSaved)
 
-        if (device.type == ConnectionType.IR) return finalizeConnected(device)
+        if (withSaved.type == ConnectionType.IR) return finalizeConnected(withSaved)
 
-        val probed = if (device.brand == TvBrand.GENERIC || device.brand == TvBrand.ANDROID_TV) {
-            probeBrand(device)
+        // Fast path: if we already have a token and a non-GENERIC brand from the
+        // saved session, skip the network probe entirely. probeBrand() does up to
+        // 6 timed HTTP/TCP attempts (~9 seconds total worst-case) which makes
+        // every reconnect feel sluggish even though the answer is already known.
+        if (!withSaved.pairingToken.isNullOrBlank() && withSaved.brand != TvBrand.GENERIC) {
+            return startWithSavedToken(withSaved)
+        }
+
+        val probed = if (withSaved.brand == TvBrand.GENERIC || withSaved.brand == TvBrand.ANDROID_TV) {
+            probeBrand(withSaved)
         } else null
 
         val effective = probed?.let {
-            val updated = device.copy(brand = it)
+            val updated = withSaved.copy(brand = it)
             currentDevice = updated
             deviceRepository.save(updated)
             updated
-        } ?: device
+        } ?: withSaved
 
         if (effective.brand == TvBrand.ROKU) {
             // Roku never asks for a code.
@@ -152,6 +183,25 @@ class RemoteCommandRepositoryImpl @Inject constructor(
                 }
             )
         }
+    }
+
+    /**
+     * Look up the device in the local DB by id first, then by IP — discovered
+     * devices from SSDP can carry a fresh USN even when the underlying TV is the
+     * same one we paired with last week. Returns the passed-in device with the
+     * saved `pairingToken` / brand merged in if a match was found.
+     */
+    private suspend fun restoreSavedPairing(device: TvDevice): TvDevice {
+        val saved = deviceRepository.get(device.id)
+            ?: device.ipAddress?.let { deviceRepository.findByIp(it) }
+            ?: return device
+        return device.copy(
+            // Prefer the persisted token; otherwise keep whatever came in.
+            pairingToken = device.pairingToken ?: saved.pairingToken,
+            // Saved brand wins because the user already went through the
+            // probe + connect flow once and we know the answer.
+            brand = if (saved.brand != TvBrand.GENERIC) saved.brand else device.brand
+        )
     }
 
     /** Tries every known TV protocol port; returns the first match. */
@@ -468,6 +518,9 @@ class RemoteCommandRepositoryImpl @Inject constructor(
         roku = null
         sony = null
         dial = null
+        cachedAvTransportUrl = null
+        cachedAvTransportHost = null
+        runCatching { httpFileServer.stop() }
         currentDevice = null
         _state.value = ConnectionState.Disconnected
     }
@@ -485,30 +538,167 @@ class RemoteCommandRepositoryImpl @Inject constructor(
 
     private suspend fun sendOverWifi(device: TvDevice, key: RemoteKey) {
         withContext(Dispatchers.IO) {
-            when (device.brand) {
-                TvBrand.SAMSUNG -> samsung?.sendKey(key)
+            val handled = when (device.brand) {
+                TvBrand.SAMSUNG -> samsung?.sendKey(key) ?: false
                 TvBrand.LG -> lg?.let { client ->
                     LgKeyMap.appId(key)?.let { client.launchApp(it) } ?: client.sendKey(key)
-                }
+                } ?: false
                 TvBrand.ROKU -> roku?.let { client ->
                     RokuKeyMap.appId(key)?.let { client.launchApp(it) } ?: client.sendKey(key)
-                }
-                TvBrand.SONY -> sony?.sendKey(key)
-                TvBrand.ANDROID_TV, TvBrand.GOOGLE_TV -> androidTv?.sendKey(key)
+                } ?: false
+                TvBrand.SONY -> sony?.sendKey(key) ?: false
+                TvBrand.ANDROID_TV, TvBrand.GOOGLE_TV -> androidTv?.let { client ->
+                    // App shortcuts (Netflix/YouTube/etc.) on Android TV go via
+                    // RemoteAppLinkLaunchRequest — the TV's launcher opens whichever
+                    // app claims the URL. Regular keys go through KeyInject.
+                    AndroidTvAppLinkMap.urlFor(key)?.let { client.sendAppLink(it) }
+                        ?: client.sendKey(key)
+                } ?: false
                 TvBrand.GENERIC -> dial?.let { client ->
-                    // DIAL only handles app launches.
-                    DialKeyMap.appName(key)?.let { client.launch(it) }
-                }
-                else -> Unit
+                    DialKeyMap.appName(key)?.let { client.launch(it) } ?: false
+                } ?: false
+                else -> false
+            }
+            // Universal app-launch fallback: most Smart TVs (including Android TV,
+            // Samsung Tizen, Sony Bravia) implement DIAL alongside their native
+            // protocol, but our brand-specific key maps don't cover every streaming
+            // app on every brand. If the press was an app shortcut and the brand
+            // path didn't handle it, try DIAL once. Skipped for GENERIC since the
+            // brand path above IS DIAL and we'd just be retrying the same thing.
+            if (!handled && device.brand != TvBrand.GENERIC && DialKeyMap.appName(key) != null) {
+                tryDialLaunch(device, key)
             }
         }
+    }
+
+    /**
+     * Best-effort DIAL launch for streaming apps. Resolves the DIAL Application-URL
+     * lazily (cached after first success) so we don't pay the SSDP/HTTP probe cost
+     * on every key press.
+     */
+    private suspend fun tryDialLaunch(device: TvDevice, key: RemoteKey): Boolean {
+        val appName = DialKeyMap.appName(key) ?: return false
+        val client = dial ?: run {
+            val ip = device.ipAddress ?: return false
+            val baseUrl = DialEndpointResolver.resolve(ip) ?: return false
+            DialClient(baseUrl).also { dial = it }
+        }
+        return client.launch(appName)
     }
 
     override suspend fun sendText(text: String) = Unit
 
     override fun supportsIr(): Boolean = irBlaster.isAvailable()
 
+    override suspend fun autoReconnect(): Boolean {
+        // Don't disturb a pairing flow already in progress — but DO reconnect if
+        // the state shows Connected but the underlying messaging socket is dead.
+        // Android TVs aggressively close idle TLS sockets (varies by firmware:
+        // Sony ~60s, Samsung ~5min, Thomson ~30s). Without this check, the user
+        // sees a "Connected" state and presses Volume but nothing happens — the
+        // bytes go into a closed socket.
+        when (val s = _state.value) {
+            is ConnectionState.Connecting,
+            is ConnectionState.PairingRequired,
+            is ConnectionState.WaitingForTvAuth -> return false
+            is ConnectionState.Connected -> if (isLiveConnection(s.device)) return true
+            else -> Unit
+        }
+        // Pick the most-recently-used device that actually has a saved pairing
+        // token (or is IR-only). Anything older than the cert store gets skipped.
+        val recent = runCatching { deviceRepository.recent(limit = 5) }.getOrDefault(emptyList())
+        val candidate = currentDevice?.takeIf { !it.pairingToken.isNullOrBlank() }
+            ?: recent.firstOrNull {
+                it.type == ConnectionType.IR ||
+                    (it.type == ConnectionType.WIFI && !it.pairingToken.isNullOrBlank() && !it.ipAddress.isNullOrBlank())
+            }
+            ?: return false
+        Log.d(TAG, "autoReconnect: trying ${candidate.name} @ ${candidate.ipAddress}")
+        val ok = runCatching { connect(candidate) }.getOrDefault(false)
+        // Silent reconnect: if it didn't succeed, scrub the Failed/PairingRequired
+        // state back to Disconnected so the user doesn't see a toast or pairing
+        // dialog they didn't ask for.
+        if (!ok && _state.value !is ConnectionState.Connected) {
+            _state.value = ConnectionState.Disconnected
+        }
+        return ok
+    }
+
+    /**
+     * Cheap liveness check on the underlying brand client. Returns false the
+     * moment the messaging socket has been closed — at which point caller
+     * should treat this as a stale Connected state and force a reconnect.
+     */
+    private fun isLiveConnection(device: TvDevice): Boolean = when (device.brand) {
+        TvBrand.ANDROID_TV, TvBrand.GOOGLE_TV -> androidTv?.isMessagingAlive() == true
+        TvBrand.SAMSUNG -> samsung != null
+        TvBrand.LG -> lg != null
+        TvBrand.ROKU -> roku != null
+        TvBrand.SONY -> sony != null
+        TvBrand.GENERIC -> dial != null
+        else -> false
+    }
+
+    override suspend fun castMedia(item: MediaItem): Boolean = withContext(Dispatchers.IO) {
+        val device = currentDevice ?: return@withContext false
+        val tvIp = device.ipAddress ?: return@withContext false
+
+        // 1. Make the media file fetchable on the LAN via the embedded HTTP server.
+        val port = runCatching { httpFileServer.start() }.getOrNull() ?: return@withContext false
+        val mime = item.mimeType ?: defaultMimeFor(item.mediaType)
+        val path = httpFileServer.register(item.uri, mime)
+        val phoneIp = localIpReachableFrom(tvIp) ?: run {
+            Log.w(TAG, "castMedia: no usable local IP for TV at $tvIp")
+            return@withContext false
+        }
+        val mediaUrl = "http://$phoneIp:$port$path"
+        Log.d(TAG, "castMedia: serving $mediaUrl mime=$mime")
+
+        // 2. Locate the TV's AVTransport control URL (cached after first hit).
+        val controlUrl = cachedAvTransportUrl?.takeIf { cachedAvTransportHost == tvIp }
+            ?: upnpClient.resolve(tvIp)?.also {
+                cachedAvTransportUrl = it
+                cachedAvTransportHost = tvIp
+            }
+        if (controlUrl == null) {
+            Log.w(TAG, "castMedia: no AVTransport endpoint on $tvIp — TV is not a DLNA renderer")
+            return@withContext false
+        }
+
+        // 3. Push.
+        upnpClient.castUrl(controlUrl, mediaUrl, mime, item.title.ifBlank { "Media" })
+    }
+
+    private fun defaultMimeFor(type: MediaType): String = when (type) {
+        MediaType.IMAGE -> "image/jpeg"
+        MediaType.VIDEO -> "video/mp4"
+        MediaType.AUDIO -> "audio/mpeg"
+    }
+
+    /**
+     * Pick a non-loopback IPv4 address on the same /24 as the TV. This is more
+     * reliable than InetAddress.getLocalHost() (which sometimes returns 127.0.0.1
+     * on Android) and falls back to any non-loopback IPv4 if the same-subnet
+     * heuristic fails.
+     */
+    private fun localIpReachableFrom(tvIp: String): String? = runCatching {
+        val target = tvIp.substringBeforeLast('.')
+        val ifaces = NetworkInterface.getNetworkInterfaces() ?: return null
+        var firstUsable: String? = null
+        for (iface in ifaces) {
+            if (!iface.isUp || iface.isLoopback) continue
+            for (addr in iface.inetAddresses) {
+                val ip = addr.hostAddress ?: continue
+                if (addr.isLoopbackAddress || ip.contains(':')) continue
+                if (firstUsable == null) firstUsable = ip
+                if (ip.substringBeforeLast('.') == target) return ip
+            }
+        }
+        firstUsable
+    }.getOrNull()
+
     companion object {
+        private const val TAG = "RemoteCommandRepo"
         private const val PAIRING_TIMEOUT_MS = 30_000L
     }
 }

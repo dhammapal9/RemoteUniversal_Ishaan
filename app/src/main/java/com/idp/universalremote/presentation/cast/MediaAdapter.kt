@@ -1,6 +1,7 @@
 package com.idp.universalremote.presentation.cast
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -10,7 +11,9 @@ import com.idp.universalremote.databinding.ItemMediaCellBinding
 import com.idp.universalremote.domain.model.MediaItem
 import com.idp.universalremote.domain.model.MediaType
 
-class MediaAdapter : ListAdapter<MediaItem, MediaAdapter.VH>(DIFF) {
+class MediaAdapter(
+    private val onClick: (MediaItem) -> Unit = {}
+) : ListAdapter<MediaItem, MediaAdapter.VH>(DIFF) {
 
     companion object {
         val DIFF = object : DiffUtil.ItemCallback<MediaItem>() {
@@ -26,8 +29,8 @@ class MediaAdapter : ListAdapter<MediaItem, MediaAdapter.VH>(DIFF) {
                 .centerCrop()
                 .into(binding.thumbnail)
             binding.title.text = item.title
-            binding.title.visibility = if (item.mediaType == MediaType.AUDIO) android.view.View.VISIBLE
-                                       else android.view.View.GONE
+            binding.title.visibility = if (item.mediaType == MediaType.AUDIO) View.VISIBLE else View.GONE
+            binding.root.setOnClickListener { onClick(item) }
         }
     }
 

@@ -123,6 +123,47 @@ class AndroidTvRemoteClient(
             .getOrDefault(false)
     }
 
+    /**
+     * Launch an installed Android TV app by its deep-link URL. This is how the
+     * official Google Android TV remote opens Netflix, YouTube etc. — it sends a
+     * RemoteAppLinkLaunchRequest (field 90) with the URL, and the TV's launcher
+     * dispatches to whichever app claims that scheme. Works for every brand of
+     * Android TV / Google TV / chromecast-with-Google-TV without per-brand mapping.
+     */
+    fun sendAppLink(url: String): Boolean {
+        val out = messagingWriter ?: run {
+            Log.w(TAG, "sendAppLink($url): writer not initialized")
+            return false
+        }
+        val socket = messagingSocket
+        if (socket == null || socket.isClosed || !socket.isConnected) {
+            Log.w(TAG, "sendAppLink($url): messaging socket not alive")
+            return false
+        }
+        Log.d(TAG, "sendAppLink → $url")
+        return runCatching {
+            writeMessage(out, buildAppLinkLaunchPayload(url))
+            true
+        }.onFailure { Log.w(TAG, "sendAppLink failed: ${it.message}", it) }
+            .getOrDefault(false)
+    }
+
+    private fun buildAppLinkLaunchPayload(url: String): ByteArray = Proto.build {
+        Proto.embed(this, RemoteFields.REMOTE_APP_LINK_LAUNCH_REQUEST) {
+            Proto.string(this, RemoteFields.APP_LINK, url)
+        }
+    }
+
+    /**
+     * True when the TLS messaging socket is connected and not yet closed. Used
+     * by the repository to detect stale "Connected" state after the TV's idle
+     * timeout has killed the underlying connection while we were backgrounded.
+     */
+    fun isMessagingAlive(): Boolean {
+        val s = messagingSocket ?: return false
+        return !s.isClosed && s.isConnected
+    }
+
     fun connectSavedSession(onSuccess: () -> Unit, onFailure: (Throwable) -> Unit) {
         scope.launch {
             runCatching { openMessagingSocket() }
@@ -644,12 +685,46 @@ class AndroidTvRemoteClient(
     }
 }
 
+/**
+ * Maps logical app-shortcut keys to the deep-link URL the Android TV launcher
+ * understands. URLs match the working tronikos / Google Android-TV-Remote sample
+ * verbatim — these are the strings that Google's own client emits, and every
+ * Android TV / Google TV in the field is wired to recognise them.
+ */
+object AndroidTvAppLinkMap {
+    fun urlFor(key: RemoteKey): String? = when (key) {
+        RemoteKey.APP_NETFLIX -> "https://www.netflix.com/title.*"
+        RemoteKey.APP_YOUTUBE -> "https://www.youtube.com"
+        RemoteKey.APP_PRIME -> "https://www.primevideo.com/"
+        RemoteKey.APP_DISNEY -> "https://www.disneyplus.com/"
+        RemoteKey.APP_HBO -> "https://max.com/"
+        RemoteKey.APP_HULU -> "https://www.hulu.com/"
+        RemoteKey.APP_SPOTIFY -> "https://open.spotify.com/"
+        RemoteKey.APP_APPLE_TV -> "https://tv.apple.com/"
+        RemoteKey.APP_PARAMOUNT -> "https://www.paramountplus.com/"
+        RemoteKey.APP_PEACOCK -> "https://www.peacocktv.com/"
+        RemoteKey.APP_PLEX -> "https://app.plex.tv/"
+        RemoteKey.APP_TUBI -> "https://tubitv.com/"
+        RemoteKey.APP_PLUTO -> "https://pluto.tv/"
+        else -> null
+    }
+}
+
 object AndroidTvKeyMap {
+    // Values mirror android.view.KeyEvent constants. App-launch keys (APP_NETFLIX,
+    // etc.) intentionally return null — they're handled via the DIAL fallback in
+    // RemoteCommandRepositoryImpl since Android TV has no single key code per app.
     fun toKeyCode(key: RemoteKey): Int? = when (key) {
         RemoteKey.POWER -> 26
         RemoteKey.HOME -> 3
         RemoteKey.BACK -> 4
         RemoteKey.MENU -> 82
+        RemoteKey.OPTIONS -> 82           // No dedicated OPTIONS keycode; MENU is the canonical mapping.
+        RemoteKey.EXIT -> 4               // Most Android TVs treat EXIT == BACK.
+        RemoteKey.BACKSPACE -> 67         // KEYCODE_DEL
+        RemoteKey.SOURCE -> 178           // KEYCODE_TV_INPUT
+        RemoteKey.VOICE -> 231            // KEYCODE_VOICE_ASSIST
+        RemoteKey.INSTANT_REPLAY -> 89    // No direct mapping → reuse REWIND so the press isn't lost.
         RemoteKey.UP -> 19
         RemoteKey.DOWN -> 20
         RemoteKey.LEFT -> 21
@@ -668,6 +743,12 @@ object AndroidTvKeyMap {
         RemoteKey.FORWARD -> 90
         RemoteKey.NEXT -> 87
         RemoteKey.PREVIOUS -> 88
+        RemoteKey.GUIDE -> 172            // KEYCODE_GUIDE
+        RemoteKey.INFO -> 165             // KEYCODE_INFO
+        RemoteKey.RED -> 183
+        RemoteKey.GREEN -> 184
+        RemoteKey.YELLOW -> 185
+        RemoteKey.BLUE -> 186
         RemoteKey.NUM_0 -> 7
         RemoteKey.NUM_1 -> 8
         RemoteKey.NUM_2 -> 9

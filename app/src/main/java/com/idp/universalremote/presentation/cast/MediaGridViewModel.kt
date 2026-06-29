@@ -8,27 +8,56 @@ import android.os.Bundle
 import android.provider.MediaStore
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.idp.universalremote.domain.model.ConnectionState
 import com.idp.universalremote.domain.model.MediaItem
 import com.idp.universalremote.domain.model.MediaType
+import com.idp.universalremote.domain.repository.RemoteCommandRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class MediaGridViewModel @Inject constructor(
-    application: Application
+    application: Application,
+    private val remoteCommandRepository: RemoteCommandRepository
 ) : AndroidViewModel(application) {
+
+    sealed interface CastResult {
+        data class Success(val title: String) : CastResult
+        data object NotConnected : CastResult
+        data class Failed(val title: String) : CastResult
+    }
 
     private val _items = MutableStateFlow<List<MediaItem>>(emptyList())
     val items: StateFlow<List<MediaItem>> = _items.asStateFlow()
 
+    private val _castResults = MutableSharedFlow<CastResult>(extraBufferCapacity = 1)
+    val castResults: SharedFlow<CastResult> = _castResults.asSharedFlow()
+
     fun load(type: MediaType) {
         viewModelScope.launch(Dispatchers.IO) {
             _items.value = query(type)
+        }
+    }
+
+    /** Cast a media item to the connected TV. Emits the outcome on [castResults]. */
+    fun cast(item: MediaItem) {
+        viewModelScope.launch {
+            if (remoteCommandRepository.connectionState.value !is ConnectionState.Connected) {
+                _castResults.emit(CastResult.NotConnected)
+                return@launch
+            }
+            val ok = remoteCommandRepository.castMedia(item)
+            _castResults.emit(
+                if (ok) CastResult.Success(item.title) else CastResult.Failed(item.title)
+            )
         }
     }
 

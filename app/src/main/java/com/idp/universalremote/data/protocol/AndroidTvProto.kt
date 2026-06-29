@@ -138,6 +138,17 @@ internal object RemoteFields {
     const val REMOTE_PING_RESPONSE = 9
     const val REMOTE_KEY_INJECT = 10
     const val REMOTE_START = 40
+    /**
+     * Field 90 carries [RemoteAppLinkLaunchRequest]. Confirmed from the working
+     * sample's protobuf-generated `Remotemessage.java`. The TV's launcher service
+     * parses the embedded URL and opens whichever installed app claims it (Netflix
+     * for `netflix.com/title.*`, YouTube for `youtube.com`, etc.) — this is how
+     * Google's own Android TV remote launches apps, not DIAL.
+     */
+    const val REMOTE_APP_LINK_LAUNCH_REQUEST = 90
+
+    /** RemoteAppLinkLaunchRequest fields. */
+    const val APP_LINK = 1
 
     // RemoteConfigure fields
     const val CONF_CODE1 = 1

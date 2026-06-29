@@ -5,6 +5,7 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.idp.universalremote.R
+import com.idp.universalremote.core.common.toast
 import com.idp.universalremote.core.common.viewBinding
 import com.idp.universalremote.databinding.FragmentCastBinding
 
@@ -20,9 +21,11 @@ class CastFragment : Fragment(R.layout.fragment_cast) {
         binding.photoCard.setOnClickListener { openMedia("image") }
         binding.videoCard.setOnClickListener { openMedia("video") }
         binding.audioCard.setOnClickListener { openMedia("audio") }
-        binding.iptvCard.setOnClickListener { /* IPTV M3U browser */ }
-        binding.imageOnlineCard.setOnClickListener { /* browser */ }
-        binding.cameraCard.setOnClickListener { /* live cam */ }
+        // Premium-tier features — give the user feedback so the tile doesn't feel broken.
+        val comingSoon = View.OnClickListener { toast(getString(R.string.feature_coming_soon)) }
+        binding.iptvCard.setOnClickListener(comingSoon)
+        binding.imageOnlineCard.setOnClickListener(comingSoon)
+        binding.cameraCard.setOnClickListener(comingSoon)
     }
 
     private fun openMedia(type: String) {

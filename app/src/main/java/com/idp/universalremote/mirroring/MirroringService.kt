@@ -20,7 +20,22 @@ class MirroringService : Service() {
 
     private var projection: MediaProjection? = null
 
+    /**
+     * Android 14+ requires every MediaProjection consumer to register a Callback so
+     * the platform can notify us when the user revokes screen sharing from the
+     * system UI. Without this, the service lingers with a dead token and the OS
+     * eventually force-stops us with a strict-mode crash on API 36.
+     */
+    private val projectionCallback = object : MediaProjection.Callback() {
+        override fun onStop() {
+            stopSelf()
+        }
+    }
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        // Foreground MUST be entered BEFORE getMediaProjection() on Android 14+ —
+        // the platform throws SecurityException otherwise. The foreground-service
+        // type is mandatory and must match the manifest declaration exactly.
         ServiceCompat.startForeground(
             this,
             NOTIF_ID,
@@ -38,7 +53,10 @@ class MirroringService : Service() {
         }
         if (data != null) {
             val manager = getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
-            projection = manager.getMediaProjection(resultCode, data)
+            projection = manager.getMediaProjection(resultCode, data).also {
+                // Callback registration is required from API 34; harmless earlier.
+                it?.registerCallback(projectionCallback, null)
+            }
         }
         return START_STICKY
     }
@@ -67,6 +85,7 @@ class MirroringService : Service() {
     }
 
     override fun onDestroy() {
+        runCatching { projection?.unregisterCallback(projectionCallback) }
         projection?.stop()
         projection = null
         super.onDestroy()

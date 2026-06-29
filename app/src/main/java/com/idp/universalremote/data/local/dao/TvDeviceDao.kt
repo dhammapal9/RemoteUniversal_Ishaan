@@ -23,6 +23,15 @@ interface TvDeviceDao {
     @Query("SELECT * FROM tv_devices WHERE id = :id LIMIT 1")
     suspend fun findById(id: String): TvDeviceEntity?
 
+    /**
+     * USNs returned by SSDP can change across power cycles; the IP is the more
+     * reliable handle when an already-paired TV is rediscovered after the app
+     * was force-killed. Picks the most-recently-connected match in case the
+     * user has multiple TVs on the same IP at different times.
+     */
+    @Query("SELECT * FROM tv_devices WHERE ipAddress = :ip ORDER BY lastConnectedAt DESC LIMIT 1")
+    suspend fun findByIp(ip: String): TvDeviceEntity?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsert(device: TvDeviceEntity)
 
